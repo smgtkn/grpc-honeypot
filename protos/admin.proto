@@ -1,0 +1,11 @@
+syntax = "proto3";
+package admin.v1;
+
+service AdminService {
+  rpc GetVersion(VersionRequest) returns (VersionResponse);
+}
+
+message VersionRequest {}
+message VersionResponse {
+  string version = 1;
+}

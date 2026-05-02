@@ -1,0 +1,18 @@
+syntax = "proto3";
+package nvidia.riva.asr;
+
+service RivaSpeechRecognition {
+  rpc Recognize(RecognizeRequest) returns (RecognizeResponse);
+  rpc StreamingRecognize(stream RecognizeRequest) returns (stream RecognizeResponse);
+}
+
+message RecognizeRequest {
+  bytes audio = 1;
+  string language_code = 2;
+  string model = 3;
+}
+
+message RecognizeResponse {
+  string transcript = 1;
+  float confidence = 2;
+}

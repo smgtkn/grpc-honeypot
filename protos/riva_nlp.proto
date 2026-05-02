@@ -1,0 +1,27 @@
+syntax = "proto3";
+package nvidia.riva.nlp;
+
+service RivaLanguageUnderstanding {
+  rpc Analyze(AnalyzeRequest) returns (AnalyzeResponse);
+  rpc ClassifyText(ClassifyTextRequest) returns (ClassifyTextResponse);
+}
+
+message AnalyzeRequest {
+  string text = 1;
+  string language_code = 2;
+}
+
+message AnalyzeResponse {
+  string intent = 1;
+  float confidence = 2;
+}
+
+message ClassifyTextRequest {
+  string text = 1;
+  string model = 2;
+}
+
+message ClassifyTextResponse {
+  string label = 1;
+  float score = 2;
+}
