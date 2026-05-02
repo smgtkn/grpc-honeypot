@@ -32,3 +32,18 @@ grpcurl -plaintext localhost:50051 list nvidia.riva.asr.RivaSpeechRecognition
 grpcurl -plaintext localhost:50051 list nvidia.riva.nlp.RivaLanguageUnderstanding
 tail -f grpc_honeypot_50051.jsonl
 ```
+
+## TLS (optional)
+
+Generate a self-signed cert for local testing and run the server securely:
+
+```bash
+./dev-cert.sh  # creates server.crt and server.key
+python server.py --port 443 --tls-cert server.crt --tls-key server.key
+```
+
+Then test with `grpcurl` over TLS (no client auth):
+
+```bash
+grpcurl -proto protos/admin.proto -D . -insecure localhost:443 list
+``` 

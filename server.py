@@ -1,4 +1,5 @@
 import grpc
+import sys
 import json
 import logging
 from datetime import datetime, timezone
@@ -194,7 +195,7 @@ class InferenceService(inference_pb2_grpc.InferenceServiceServicer):
         return inference_pb2.PredictResponse()
 
 
-def serve(port=50051):
+def serve(port=50051, tls_cert=None, tls_key=None):
     server = grpc.server(
         futures.ThreadPoolExecutor(max_workers=10),
         interceptors=[LoggingInterceptor()],
@@ -228,9 +229,25 @@ def serve(port=50051):
 
     reflection.enable_server_reflection(service_names, server)
 
-    server.add_insecure_port(f"[::]:{port}")
+    # Bind to secure or insecure port depending on provided TLS files
+    if tls_cert and tls_key:
+        try:
+            private_key = open(tls_key, "rb").read()
+            certificate_chain = open(tls_cert, "rb").read()
+            server_credentials = grpc.ssl_server_credentials(((private_key, certificate_chain),))
+            bound = server.add_secure_port(f"[::]:{port}", server_credentials)
+            if bound == 0:
+                print(f"Failed to bind secure port {port}")
+                raise SystemExit(1)
+            print(f"Listening securely on {port}")
+        except Exception as e:
+            print(f"Error setting up TLS: {e}")
+            raise
+    else:
+        server.add_insecure_port(f"[::]:{port}")
+        print(f"Listening on {port}")
+
     server.start()
-    print(f"Listening on {port}")
     server.wait_for_termination()
 
 
@@ -240,9 +257,15 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="gRPC Honeypot Server")
     parser.add_argument("--port", type=int, default=50051, help="Port to listen on")
-    args = parser.parse_args()  
+    parser.add_argument("--tls-cert", type=str, default=None, help="Path to TLS certificate (PEM)")
+    parser.add_argument("--tls-key", type=str, default=None, help="Path to TLS private key (PEM)")
+    args = parser.parse_args()
+
+    if (args.tls_cert and not args.tls_key) or (args.tls_key and not args.tls_cert):
+        parser.error("Both --tls-cert and --tls-key must be provided together to enable TLS")
+
     logging.basicConfig(filename=f"grpc_honeypot_{args.port}.jsonl", level=logging.INFO, format="%(message)s")
 
-    serve(port=args.port)
+    serve(port=args.port, tls_cert=args.tls_cert, tls_key=args.tls_key)
 
 
