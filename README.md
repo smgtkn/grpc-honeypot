@@ -47,3 +47,14 @@ Then test with `grpcurl` over TLS (no client auth):
 ```bash
 grpcurl -proto protos/admin.proto -D . -insecure localhost:443 list
 ``` 
+## Envoy Proxy (optional)
+
+Set up an envoy proxy that logs all the HTTP requests on port 50051 and redirects the traffic to the gRPC server on port 50052.
+
+```bash
+docker run --rm -it \
+  -v $(pwd)/envoy.yaml:/etc/envoy/envoy.yaml \
+  -v $(pwd)/logs:/var/log/envoy \
+  -p 50051:50051 \
+  envoyproxy/envoy:v1.28-latest
+  ```

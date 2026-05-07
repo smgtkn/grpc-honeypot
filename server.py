@@ -264,7 +264,7 @@ if __name__ == "__main__":
     if (args.tls_cert and not args.tls_key) or (args.tls_key and not args.tls_cert):
         parser.error("Both --tls-cert and --tls-key must be provided together to enable TLS")
 
-    logging.basicConfig(filename=f"grpc_honeypot_{args.port}.jsonl", level=logging.INFO, format="%(message)s")
+    logging.basicConfig(filename=f"./logs/grpc_honeypot_{args.port}.jsonl", level=logging.INFO, format="%(message)s")
 
     serve(port=args.port, tls_cert=args.tls_cert, tls_key=args.tls_key)
 
