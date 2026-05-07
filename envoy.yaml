@@ -49,7 +49,7 @@ static_resources:
   clusters:
   - name: grpc_service
     connect_timeout: 0.25s
-    type: STATIC
+    type: STRICT_DNS
     lb_policy: ROUND_ROBIN
     http2_protocol_options: {} # Critical: Forces HTTP/2 for gRPC
     load_assignment:
@@ -59,5 +59,5 @@ static_resources:
         - endpoint:
             address:
               socket_address:
-                address: 127.0.0.1
-                port_value: 50052 # Your actual gRPC server port
+                address: host.docker.internal
+                port_value: 50052

@@ -56,5 +56,7 @@ docker run --rm -it \
   -v $(pwd)/envoy.yaml:/etc/envoy/envoy.yaml \
   -v $(pwd)/logs:/var/log/envoy \
   -p 50051:50051 \
+  --add-host=host.docker.internal:host-gateway \
+  -d \
   envoyproxy/envoy:v1.28-latest
   ```
